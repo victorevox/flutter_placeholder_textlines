@@ -79,7 +79,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildSimpleTextPlaceholder(TextAlign align) {
     return Container(
-      // decoration: BoxDecoration(color: Colors.yellow),
       width: 300,
       child: PlaceholderLines(
         count: 3,
@@ -103,13 +102,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _buildAnimated() {
     return Container(
-      // decoration: BoxDecoration(color: Colors.yellow),
       width: 300,
       child: PlaceholderLines(
         count: 3,
         animate: true,
         color: Colors.purple,
-        // align: align,
       ),
     );
   }
@@ -120,7 +117,6 @@ class _MyHomePageState extends State<MyHomePage> {
       elevation: 9,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
-        // decoration: BoxDecoration(color: Colors.yellow),
         width: 300,
         child: Row(
           children: <Widget>[
@@ -134,7 +130,6 @@ class _MyHomePageState extends State<MyHomePage> {
             Expanded(
               child: PlaceholderLines(
                 count: 3,
-                // align: align,
               ),
             ),
           ],
@@ -143,7 +138,4 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  // Widget _buildSimpleTextPlaceholder(TextAlign align) {
-  //   return
-  // }
 }
