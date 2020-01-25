@@ -1,8 +1,8 @@
 name: flutter_placeholder_textlines
-description: A new Flutter package project.
+description: A simple plugin to generate placeholder lines that emulates text in a UI, useful for displaying placeholder content while loading or empty items
 version: 0.0.1
 author:
-homepage:
+homepage: https://github.com/victorevox/flutter_placeholder_textlines.git
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
