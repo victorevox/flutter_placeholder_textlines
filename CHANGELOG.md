@@ -1,3 +1,6 @@
+## [1.0.2] - 26/01/20
+* Dispose animation controller
+  
 ## [1.0.1] - 26/01/20
 * Fix unexported widget
 

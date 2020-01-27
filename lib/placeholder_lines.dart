@@ -203,6 +203,12 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
     double realMaxWidth = constraints.maxWidth;
     return realMaxWidth * widget.minWidth;
   }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
 }
 
 // class TranslateTransition extends StatelessWidget {
