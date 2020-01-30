@@ -1,3 +1,8 @@
+## [1.0.3] - 30/01/20
+* Fixed issue where context was expected but null was found
+* Fixed issue where each line was rebuild with a different width every time a parent widget rebuild it's state, added a property to enable this behaviour if wanted (```rebuildOnStateChange```)
+* Updated README.md
+  
 ## [1.0.2] - 26/01/20
 * Dispose animation controller
   

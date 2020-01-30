@@ -4,7 +4,7 @@ A simple plugin to generate placeholder lines that emulates text in a UI, useful
 
 ## Example of Usage
 
-```
+```dart
 Widget _buildCustomColorSizePlaceholder() {
     return Container(
       width: 200,
@@ -77,6 +77,54 @@ Widget _buildCustomColorSizePlaceholder() {
       ),
     );
   }
+  ```
+
+  ## API Options
+
+  ```dart
+  /// Defines how many lines to build
+  final int count;
+
+  /// Defines `color` to be used as base when building each line
+  final Color color;
+
+  /// Defines `alignment` for all the lines generated
+  final TextAlign align;
+
+  /// Defines the `min` value for the `opacity` that a line could have, since color opacity it's generated randomly ,
+  /// this prevents the value from going to low (making it invisible)
+  /// defaults to [0.4]
+  final double minOpacity;
+
+  /// Defines the `max` value for the `opacity` that a line could have, since color opacity it's generated randomly ,
+  /// defaults to [0.94]
+  final double maxOpacity;
+
+  /// Defines the `max` `width` that a line could have, since `width` it's generated randomly
+  /// defaults to [.95]
+  final double maxWidth;
+
+  /// Defines the `min` `width` that a line could have, since `width` it's generated randomly
+  /// defaults to [.72]
+  final double minWidth;
+
+  /// Defines the line `height`
+  /// defaults to [12]
+  final double lineHeight;
+
+  /// if [true], plays a nice animation of an overlay
+  final bool animate;
+
+  /// Use a [customAnimationOverlay] to display instead of the difault one
+  final Widget customAnimationOverlay;
+
+  /// Set a custom [animationOverlayColor]
+  final Color animationOverlayColor;
+
+  /// If [true] , this will cause the lines to be rebuild with different widths (randomly generated)
+  /// every time any parent widget rebuilds it's state
+  /// defaults to [false]
+  final bool rebuildOnStateChange;
   ```
 
   Also please see example at: https://github.com/victorevox/flutter_placeholder_textlines/tree/master/example

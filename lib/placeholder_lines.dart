@@ -39,7 +39,13 @@ class PlaceholderLines extends StatefulWidget {
   /// Use a [customAnimationOverlay] to display instead of the difault one
   final Widget customAnimationOverlay;
 
+  /// Set a custom [animationOverlayColor]
   final Color animationOverlayColor;
+
+  /// If [true] , this will cause the lines to be rebuild with different widths (randomly generated)
+  /// every time any parent widget rebuilds it's state
+  /// defaults to [false]
+  final bool rebuildOnStateChange;
 
   const PlaceholderLines({
     Key key,
@@ -54,6 +60,7 @@ class PlaceholderLines extends StatefulWidget {
     this.animate = false,
     this.customAnimationOverlay,
     this.animationOverlayColor,
+    this.rebuildOnStateChange = false,
   })  : assert(count is int),
         assert(minOpacity <= 1 && maxOpacity <= 1),
         assert(minWidth <= 1 && maxWidth <= 1),
@@ -70,36 +77,50 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
     with SingleTickerProviderStateMixin {
   AnimationController _animationController;
   Animation<RelativeRect> _animation;
+  Map<int, double> _seeds;
+  
   double get _randomSeed => Random().nextDouble();
+
+  bool _disposed = false;
 
   @override
   void initState() {
-    // _randomSeed = ;
+    _seeds = List(widget.count).asMap().map((index,_) {
+      return MapEntry(index, _randomSeed);
+    });
     super.initState();
     _animationController =
         AnimationController(vsync: this, duration: Duration(seconds: 1));
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final RenderBox renderO = context.findRenderObject();
-      final BoxConstraints constraints = renderO.constraints;
-      final double maxWidth = _getMaxConstrainedWidth(constraints);
-      final CurvedAnimation curvedAnimation = CurvedAnimation(
-          curve: Curves.easeIn,
-          reverseCurve: Curves.easeInOut,
-          parent: _animationController);
-      _animation = RelativeRectTween(
-        begin: RelativeRect.fromLTRB(0, 0, maxWidth, 0),
-        end: RelativeRect.fromLTRB(maxWidth, 0, -maxWidth, 0),
-      ).animate(curvedAnimation)
-        ..addStatusListener((status) {
-          if (status == AnimationStatus.completed) {
-            _animationController.reverse();
-          } else if (status == AnimationStatus.dismissed) {
-            _animationController.forward();
-          }
-        });
-      setState(() {
-        _animationController.forward();
+    WidgetsBinding.instance.addPostFrameCallback(_postFrameCallback);
+  }
+
+  void _postFrameCallback([Duration _]) {
+    if(context == null) {
+      if(!_disposed) {
+        Future.delayed(Duration(seconds: 1)).then((__)=>_postFrameCallback(_));
+      }
+      return;
+    }
+    final RenderBox renderO = context.findRenderObject();
+    final BoxConstraints constraints = renderO.constraints;
+    final double maxWidth = _getMaxConstrainedWidth(constraints);
+    final CurvedAnimation curvedAnimation = CurvedAnimation(
+        curve: Curves.easeIn,
+        reverseCurve: Curves.easeInOut,
+        parent: _animationController);
+    _animation = RelativeRectTween(
+      begin: RelativeRect.fromLTRB(0, 0, maxWidth, 0),
+      end: RelativeRect.fromLTRB(maxWidth, 0, -maxWidth, 0),
+    ).animate(curvedAnimation)
+      ..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          _animationController.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          _animationController.forward();
+        }
       });
+    setState(() {
+      _animationController.forward();
     });
   }
 
@@ -129,7 +150,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   List<Widget> _buildLines(BoxConstraints constraints) {
     List<Widget> list = [];
     for (var i = 0; i < widget.count; i++) {
-      double _random = _randomSeed;
+      double _random = widget.rebuildOnStateChange? _randomSeed : _seeds[i];
       double _opacity = (widget.maxOpacity -
               ((widget.maxOpacity - widget.minOpacity) * _random))
           .abs();
@@ -139,7 +160,6 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
       double _width = (constrainedMaxWidth -
               ((constrainedMaxWidth - constrainedMinWidth) * _random))
           .abs();
-      // print(_opacity);
       final Widget staticWidget = Container(
         height: widget.lineHeight,
         width: _width,
@@ -206,6 +226,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   @override
   void dispose() {
+    _disposed = true;
     _animationController.dispose();
     super.dispose();
   }
