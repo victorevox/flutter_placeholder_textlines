@@ -101,14 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _buildAnimated() {
-    return Container(
-      width: 300,
-      child: PlaceholderLines(
-        count: 3,
-        animate: true,
-        color: Colors.purple,
-      ),
-    );
+    return AnimatedWrapper();
   }
 
   _buildCardExample() {
@@ -124,8 +117,16 @@ class _MyHomePageState extends State<MyHomePage> {
               margin: EdgeInsets.only(right: 16),
               width: 70,
               height: 70,
-              decoration: BoxDecoration(color: Colors.grey.withOpacity(.6), ),
-              child: Center(child: Icon(Icons.photo_size_select_actual, color: Colors.white, size: 38,),),
+              decoration: BoxDecoration(
+                color: Colors.grey.withOpacity(.6),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.photo_size_select_actual,
+                  color: Colors.white,
+                  size: 38,
+                ),
+              ),
             ),
             Expanded(
               child: PlaceholderLines(
@@ -137,5 +138,41 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+}
 
+class AnimatedWrapper extends StatefulWidget {
+  const AnimatedWrapper({
+    Key key,
+  }) : super(key: key);
+
+  @override
+  _AnimatedWrapperState createState() => _AnimatedWrapperState();
+}
+
+class _AnimatedWrapperState extends State<AnimatedWrapper> {
+  bool _animated = true;
+  @override
+  void initState() {
+    super.initState();
+    _changeState();
+  }
+
+  _changeState() {
+    setState(() {
+      _animated = !_animated;
+    });
+    Future.delayed(Duration(seconds: 5)).then((_) => _changeState());
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 300,
+      child: PlaceholderLines(
+        count: 3,
+        animate: _animated,
+        color: Colors.purple,
+      ),
+    );
+  }
 }

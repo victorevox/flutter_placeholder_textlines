@@ -78,47 +78,77 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   AnimationController _animationController;
   Animation<RelativeRect> _animation;
   Map<int, double> _seeds;
-  
+
   double get _randomSeed => Random().nextDouble();
 
   bool _disposed = false;
 
   @override
-  void initState() {
-    _seeds = List(widget.count).asMap().map((index,_) {
-      return MapEntry(index, _randomSeed);
-    });
-    super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(seconds: 1));
-    WidgetsBinding.instance.addPostFrameCallback(_postFrameCallback);
+  void didUpdateWidget(PlaceholderLines oldWidget) {
+    if (oldWidget.animate != widget.animate) {
+      if (widget.animate) {
+        // _setupAnimation();
+        _animationController.forward();
+      } else {
+        // if(_animationController != null) {
+        //   _animationController.dispose();
+        //   _animationController = null;
+        // }
+        _animationController.stop();
+      }
+    }
+    super.didUpdateWidget(oldWidget);
   }
 
-  void _postFrameCallback([Duration _]) {
-    if(context == null) {
-      if(!_disposed) {
-        Future.delayed(Duration(seconds: 1)).then((__)=>_postFrameCallback(_));
+  @override
+  void initState() {
+    _seeds = List(widget.count).asMap().map((index, _) {
+      return MapEntry(index, _randomSeed);
+    });
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 1),
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback(_setupAnimation);
+    // if(widget.animate) {
+    // }
+    super.initState();
+  }
+
+  void _setupAnimation([Duration _]) {
+    if (context == null) {
+      if (!_disposed) {
+        Future.delayed(Duration(seconds: 1)).then(
+          (__) => _setupAnimation(_),
+        );
       }
       return;
     }
+
     final RenderBox renderO = context.findRenderObject();
     final BoxConstraints constraints = renderO.constraints;
     final double maxWidth = _getMaxConstrainedWidth(constraints);
     final CurvedAnimation curvedAnimation = CurvedAnimation(
-        curve: Curves.easeIn,
-        reverseCurve: Curves.easeInOut,
-        parent: _animationController);
+      curve: Curves.easeIn,
+      reverseCurve: Curves.easeInOut,
+      parent: _animationController,
+    );
     _animation = RelativeRectTween(
       begin: RelativeRect.fromLTRB(0, 0, maxWidth, 0),
       end: RelativeRect.fromLTRB(maxWidth, 0, -maxWidth, 0),
     ).animate(curvedAnimation)
-      ..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _animationController.reverse();
-        } else if (status == AnimationStatus.dismissed) {
-          _animationController.forward();
-        }
-      });
+      ..addStatusListener(
+        (status) {
+          if (!widget.animate) return;
+          if (status == AnimationStatus.completed) {
+            _animationController.reverse();
+          } else if (status == AnimationStatus.dismissed) {
+            _animationController.forward();
+          }
+        },
+      );
     setState(() {
       _animationController.forward();
     });
@@ -150,7 +180,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   List<Widget> _buildLines(BoxConstraints constraints) {
     List<Widget> list = [];
     for (var i = 0; i < widget.count; i++) {
-      double _random = widget.rebuildOnStateChange? _randomSeed : _seeds[i];
+      double _random = widget.rebuildOnStateChange ? _randomSeed : _seeds[i];
       double _opacity = (widget.maxOpacity -
               ((widget.maxOpacity - widget.minOpacity) * _random))
           .abs();
@@ -189,11 +219,13 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
                                   decoration: BoxDecoration(boxShadow: [
                                     BoxShadow(
                                         blurRadius: 18,
-                                        color: widget.animationOverlayColor?? Color(0xFFFFFFFF),
+                                        color: widget.animationOverlayColor ??
+                                            Color(0xFFFFFFFF),
                                         offset: Offset(4, 3)),
                                     BoxShadow(
                                         blurRadius: 28,
-                                        color: widget.animationOverlayColor?? Color(0xFFFFFFFF),
+                                        color: widget.animationOverlayColor ??
+                                            Color(0xFFFFFFFF),
                                         offset: Offset(1, 3)),
                                   ]),
                                 ),
