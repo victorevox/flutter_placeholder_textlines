@@ -132,7 +132,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
     if (renderO == null) {
       throw Exception(
-          "RenderBox not found -- could not calculate BoxConstaints for "
+          "RenderBox not found -- could not calculate BoxConstraints for "
           "placeholder_lines");
     }
 
