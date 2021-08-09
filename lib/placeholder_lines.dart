@@ -37,10 +37,10 @@ class PlaceholderLines extends StatefulWidget {
   final bool animate;
 
   /// Use a [customAnimationOverlay] to display instead of the difault one
-  final Widget customAnimationOverlay;
+  final Widget? customAnimationOverlay;
 
   /// Set a custom [animationOverlayColor]
-  final Color animationOverlayColor;
+  final Color? animationOverlayColor;
 
   /// If [true] , this will cause the lines to be rebuild with different widths (randomly generated)
   /// every time any parent widget rebuilds it's state
@@ -48,8 +48,8 @@ class PlaceholderLines extends StatefulWidget {
   final bool rebuildOnStateChange;
 
   const PlaceholderLines({
-    Key key,
-    @required this.count,
+    Key? key,
+    required this.count,
     this.align = TextAlign.left,
     this.color = const Color(0xFFDEDEDE),
     this.minOpacity = 0.4,
@@ -75,9 +75,9 @@ class PlaceholderLines extends StatefulWidget {
 
 class _PlaceholderLinesState extends State<PlaceholderLines>
     with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<RelativeRect> _animation;
-  Map<int, double> _seeds;
+  late AnimationController _animationController;
+  Animation<RelativeRect>? _animation;
+  late Map<int, double> _seeds;
 
   double get _randomSeed => Random().nextDouble();
 
@@ -102,7 +102,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   @override
   void initState() {
-    _seeds = List(widget.count).asMap().map((index, _) {
+    _seeds = List.filled(widget.count, 0).asMap().map((index, _) {
       return MapEntry(index, _randomSeed);
     });
 
@@ -111,13 +111,14 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
       duration: Duration(seconds: 1),
     );
 
-    WidgetsBinding.instance.addPostFrameCallback(_setupAnimation);
+    WidgetsFlutterBinding.ensureInitialized();
+    WidgetsBinding.instance!.addPostFrameCallback(_setupAnimation);
     // if(widget.animate) {
     // }
     super.initState();
   }
 
-  void _setupAnimation([Duration _]) {
+  void _setupAnimation([Duration? _]) {
     if (context == null) {
       if (!_disposed) {
         Future.delayed(Duration(seconds: 1)).then(
@@ -127,7 +128,14 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
       return;
     }
 
-    final RenderBox renderO = context.findRenderObject();
+    final RenderBox? renderO = context.findRenderObject() as RenderBox;
+
+    if (renderO == null) {
+      throw Exception(
+          "RenderBox not found -- could not calculate BoxConstraints for "
+          "placeholder_lines");
+    }
+
     final BoxConstraints constraints = renderO.constraints;
     final double maxWidth = _getMaxConstrainedWidth(constraints);
     final CurvedAnimation curvedAnimation = CurvedAnimation(
@@ -180,7 +188,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   List<Widget> _buildLines(BoxConstraints constraints) {
     List<Widget> list = [];
     for (var i = 0; i < widget.count; i++) {
-      double _random = widget.rebuildOnStateChange ? _randomSeed : _seeds[i];
+      double _random = widget.rebuildOnStateChange ? _randomSeed : _seeds[i]!;
       double _opacity = (widget.maxOpacity -
               ((widget.maxOpacity - widget.minOpacity) * _random))
           .abs();
@@ -200,7 +208,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
       list.add(
         _animation != null && widget.animate == true
             ? AnimatedBuilder(
-                animation: _animation,
+                animation: _animation!,
                 child: staticWidget,
                 builder: (context, child) {
                   return Container(
@@ -209,9 +217,9 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
                       child: Stack(
                         overflow: Overflow.clip,
                         children: <Widget>[
-                          child,
+                          if (child != null) child,
                           Transform.translate(
-                            offset: Offset(_animation.value.left, 0),
+                            offset: Offset(_animation!.value.left, 0),
                             child: widget.customAnimationOverlay ??
                                 Container(
                                   height: widget.lineHeight,

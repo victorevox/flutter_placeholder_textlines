@@ -1,3 +1,7 @@
+## [1.0.5] - 14/06/20
+
+* Null safety
+
 ## [1.0.4] - 25/02/20
 
 * Improve performance for not animated widgets.
