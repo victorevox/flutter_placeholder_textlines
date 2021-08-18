@@ -81,8 +81,6 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   double get _randomSeed => Random().nextDouble();
 
-  bool _disposed = false;
-
   @override
   void didUpdateWidget(PlaceholderLines oldWidget) {
     if (oldWidget.animate != widget.animate) {
@@ -119,15 +117,6 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   }
 
   void _setupAnimation([Duration? _]) {
-    if (context == null) {
-      if (!_disposed) {
-        Future.delayed(Duration(seconds: 1)).then(
-          (__) => _setupAnimation(_),
-        );
-      }
-      return;
-    }
-
     final RenderBox? renderO = context.findRenderObject() as RenderBox;
 
     if (renderO == null) {
@@ -206,7 +195,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
         ),
       );
       list.add(
-        _animation != null && widget.animate == true
+        AnimatedSwitcher(duration: Duration(milliseconds: 400),child: _animation != null && widget.animate == true
             ? AnimatedBuilder(
                 animation: _animation!,
                 child: staticWidget,
@@ -215,7 +204,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
                     // decoration: BoxDecoration(color: Colors.purple),
                     child: ClipRect(
                       child: Stack(
-                        overflow: Overflow.clip,
+                        clipBehavior: Clip.antiAlias,
                         children: <Widget>[
                           if (child != null) child,
                           Transform.translate(
@@ -242,8 +231,8 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
                       ),
                     ),
                   );
-                })
-            : staticWidget,
+                },)
+            : staticWidget,),
       );
       if (i < widget.count - 1) {
         list.add(SizedBox(
@@ -266,19 +255,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   @override
   void dispose() {
-    _disposed = true;
     _animationController.dispose();
     super.dispose();
   }
 }
-
-// class TranslateTransition extends StatelessWidget {
-//   const TranslateTransition({Key key}) : super(key: key);
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Container(
-//       child: child,
-//     );
-//   }
-// }
