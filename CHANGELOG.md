@@ -1,4 +1,7 @@
 
+## [1.1.2] - 18/08/21
+* Some fix
+ 
 ## [1.1.1] - 09/08/21
 * Some small improvements
   
