@@ -117,6 +117,8 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   }
 
   void _setupAnimation([Duration? _]) {
+    if(!mounted) return;
+    
     final RenderBox? renderO = context.findRenderObject() as RenderBox;
 
     if (renderO == null) {
