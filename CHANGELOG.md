@@ -1,3 +1,7 @@
+
+## [1.1.1] - 09/08/21
+* Some small improvements
+  
 ## [1.1.0] - 09/08/21
 * Version change
 ## [1.0.5] - 14/06/20
