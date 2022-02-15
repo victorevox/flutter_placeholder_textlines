@@ -43,8 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   _buildSubtitle("Centered"),
                   _buildSimpleTextPlaceholder(TextAlign.center),
-                  _buildSubtitle("Set lineSpaceHeight And borderRadius"),
-                  _buildLineSpaceHeightAndRadius(),
+                  _buildSubtitle("lineSpaceHeight or borderRadius"),
+                  _buildLineSpaceHeightOrRadiusOrAnimateDuration(),
                   _buildSubtitle("Left"),
                   _buildSimpleTextPlaceholder(TextAlign.left),
                   _buildSubtitle("Right"),
@@ -141,7 +141,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Widget _buildLineSpaceHeightAndRadius() {
+  Widget _buildLineSpaceHeightOrRadiusOrAnimateDuration() {
     return Container(
       width: 300,
       child: PlaceholderLines(
@@ -150,6 +150,7 @@ class _MyHomePageState extends State<MyHomePage> {
         color: Colors.purple,
         lineSpaceHeight: 2,
         borderRadius: BorderRadius.circular(8.0),
+        animateDuration: Duration(seconds: 5),
       ),
     );
   }

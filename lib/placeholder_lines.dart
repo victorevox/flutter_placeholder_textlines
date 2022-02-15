@@ -37,6 +37,7 @@ class PlaceholderLines extends StatefulWidget {
 
   /// if [true], plays a nice animation of an overlay
   final bool animate;
+  final Duration animateDuration; 
 
   /// Use a [customAnimationOverlay] to display instead of the difault one
   final Widget? customAnimationOverlay;
@@ -64,6 +65,7 @@ class PlaceholderLines extends StatefulWidget {
     this.animate = false,
     this.customAnimationOverlay,
     this.animationOverlayColor,
+    this.animateDuration = const Duration(seconds: 1),
     this.rebuildOnStateChange = false,
   })  :
         assert(minOpacity <= 1 && maxOpacity <= 1),
@@ -107,7 +109,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 1),
+      duration: widget.animateDuration,
     );
 
     WidgetsBinding.instance?.addPostFrameCallback(_setupAnimation);
@@ -119,7 +121,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
     // ignore: unnecessary_null_comparison
     if (context == null) {
       if (!_disposed) {
-        Future.delayed(const Duration(seconds: 1)).then(
+        Future.delayed( widget.animateDuration).then(
               (__) => _setupAnimation(_),
         );
       }
