@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  MyHomePage({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -43,6 +43,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: <Widget>[
                   _buildSubtitle("Centered"),
                   _buildSimpleTextPlaceholder(TextAlign.center),
+                  _buildSubtitle("Set lineSpaceHeight And borderRadius"),
+                  _buildLineSpaceHeightAndRadius(),
                   _buildSubtitle("Left"),
                   _buildSimpleTextPlaceholder(TextAlign.left),
                   _buildSubtitle("Right"),
@@ -138,11 +140,24 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+
+  Widget _buildLineSpaceHeightAndRadius() {
+    return Container(
+      width: 300,
+      child: PlaceholderLines(
+        count: 3,
+        animate: true,
+        color: Colors.purple,
+        lineSpaceHeight: 2,
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+    );
+  }
 }
 
 class AnimatedWrapper extends StatefulWidget {
   const AnimatedWrapper({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -154,15 +169,8 @@ class _AnimatedWrapperState extends State<AnimatedWrapper> {
   @override
   void initState() {
     super.initState();
-    _changeState();
   }
 
-  _changeState() {
-    setState(() {
-      _animated = !_animated;
-    });
-    Future.delayed(Duration(seconds: 5)).then((_) => _changeState());
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +178,7 @@ class _AnimatedWrapperState extends State<AnimatedWrapper> {
       width: 300,
       child: PlaceholderLines(
         count: 3,
-        animate: _animated,
+        animate: true,
         color: Colors.purple,
       ),
     );

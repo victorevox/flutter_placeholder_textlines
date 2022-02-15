@@ -1,5 +1,4 @@
 import 'dart:math';
-
 import 'package:flutter/widgets.dart';
 
 class PlaceholderLines extends StatefulWidget {
@@ -32,6 +31,9 @@ class PlaceholderLines extends StatefulWidget {
   /// Defines the line `height`
   /// defaults to [12]
   final double lineHeight;
+  final double lineSpaceHeight;
+
+  final BorderRadius borderRadius;
 
   /// if [true], plays a nice animation of an overlay
   final bool animate;
@@ -57,15 +59,15 @@ class PlaceholderLines extends StatefulWidget {
     this.maxWidth = .95,
     this.minWidth = .72,
     this.lineHeight = 12,
+    this.lineSpaceHeight = 12,
+    this.borderRadius = BorderRadius.zero,
     this.animate = false,
     this.customAnimationOverlay,
     this.animationOverlayColor,
     this.rebuildOnStateChange = false,
-  })  : assert(count is int),
+  })  :
         assert(minOpacity <= 1 && maxOpacity <= 1),
         assert(minWidth <= 1 && maxWidth <= 1),
-        assert(minOpacity is double),
-        assert(maxOpacity is double),
         assert(minOpacity <= maxOpacity),
         super(key: key);
 
@@ -81,17 +83,14 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   double get _randomSeed => Random().nextDouble();
 
+  bool _disposed = false;
+
   @override
   void didUpdateWidget(PlaceholderLines oldWidget) {
     if (oldWidget.animate != widget.animate) {
       if (widget.animate) {
-        // _setupAnimation();
         _animationController.forward();
       } else {
-        // if(_animationController != null) {
-        //   _animationController.dispose();
-        //   _animationController = null;
-        // }
         _animationController.stop();
       }
     }
@@ -100,36 +99,38 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   @override
   void initState() {
-    _seeds = List.filled(widget.count, 0).asMap().map((index, _) {
+    _seeds = List.filled(widget.count, null, growable: false)
+        .asMap()
+        .map((index, _) {
       return MapEntry(index, _randomSeed);
     });
 
     _animationController = AnimationController(
       vsync: this,
-      duration: Duration(seconds: 1),
+      duration: const Duration(seconds: 1),
     );
 
-    WidgetsFlutterBinding.ensureInitialized();
-    WidgetsBinding.instance!.addPostFrameCallback(_setupAnimation);
-    // if(widget.animate) {
-    // }
+    WidgetsBinding.instance?.addPostFrameCallback(_setupAnimation);
+
     super.initState();
   }
 
   void _setupAnimation([Duration? _]) {
-    if(!mounted) return;
-    
-    final RenderBox? renderO = context.findRenderObject() as RenderBox;
-
-    if (renderO == null) {
-      throw Exception(
-          "RenderBox not found -- could not calculate BoxConstraints for "
-          "placeholder_lines");
+    // ignore: unnecessary_null_comparison
+    if (context == null) {
+      if (!_disposed) {
+        Future.delayed(const Duration(seconds: 1)).then(
+              (__) => _setupAnimation(_),
+        );
+      }
+      return;
     }
 
-    final BoxConstraints constraints = renderO.constraints;
-    final double maxWidth = _getMaxConstrainedWidth(constraints);
-    final CurvedAnimation curvedAnimation = CurvedAnimation(
+    final renderO = context.findRenderObject();
+    // ignore: invalid_use_of_protected_member
+    final constraints = renderO?.constraints as BoxConstraints;
+    final maxWidth = _getMaxConstrainedWidth(constraints);
+    final curvedAnimation = CurvedAnimation(
       curve: Curves.easeIn,
       reverseCurve: Curves.easeInOut,
       parent: _animationController,
@@ -139,7 +140,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
       end: RelativeRect.fromLTRB(maxWidth, 0, -maxWidth, 0),
     ).animate(curvedAnimation)
       ..addStatusListener(
-        (status) {
+            (status) {
           if (!widget.animate) return;
           if (status == AnimationStatus.completed) {
             _animationController.reverse();
@@ -155,16 +156,16 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
 
   @override
   Widget build(BuildContext context) {
-    CrossAxisAlignment _alignment = this.widget.align == TextAlign.left
+    var _alignment = widget.align == TextAlign.left
         ? CrossAxisAlignment.start
-        : this.widget.align == TextAlign.right
-            ? CrossAxisAlignment.end
-            : this.widget.align == TextAlign.center
-                ? CrossAxisAlignment.center
-                : CrossAxisAlignment.baseline;
+        : widget.align == TextAlign.right
+        ? CrossAxisAlignment.end
+        : widget.align == TextAlign.center
+        ? CrossAxisAlignment.center
+        : CrossAxisAlignment.baseline;
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Container(
+        return SizedBox(
           width: constraints.maxWidth,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -177,17 +178,17 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   }
 
   List<Widget> _buildLines(BoxConstraints constraints) {
-    List<Widget> list = [];
+    var list = <Widget>[];
     for (var i = 0; i < widget.count; i++) {
-      double _random = widget.rebuildOnStateChange ? _randomSeed : _seeds[i]!;
-      double _opacity = (widget.maxOpacity -
-              ((widget.maxOpacity - widget.minOpacity) * _random))
+      var _random = (widget.rebuildOnStateChange ? _randomSeed : _seeds[i])!;
+      var _opacity = (widget.maxOpacity -
+          ((widget.maxOpacity - widget.minOpacity) * _random))
           .abs();
       // double realMaxWidth = constraints.maxWidth;
-      double constrainedMaxWidth = _getMaxConstrainedWidth(constraints);
-      double constrainedMinWidth = _getMinConstrainedWidth(constraints);
-      double _width = (constrainedMaxWidth -
-              ((constrainedMaxWidth - constrainedMinWidth) * _random))
+      var constrainedMaxWidth = _getMaxConstrainedWidth(constraints);
+      var constrainedMinWidth = _getMinConstrainedWidth(constraints);
+      var _width = (constrainedMaxWidth -
+          ((constrainedMaxWidth - constrainedMinWidth) * _random))
           .abs();
       final Widget staticWidget = Container(
         height: widget.lineHeight,
@@ -197,48 +198,47 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
         ),
       );
       list.add(
-        AnimatedSwitcher(duration: Duration(milliseconds: 400),child: _animation != null && widget.animate == true
+        _animation != null && widget.animate == true
             ? AnimatedBuilder(
-                animation: _animation!,
-                child: staticWidget,
-                builder: (context, child) {
-                  return Container(
-                    // decoration: BoxDecoration(color: Colors.purple),
-                    child: ClipRect(
-                      child: Stack(
-                        clipBehavior: Clip.antiAlias,
-                        children: <Widget>[
-                          if (child != null) child,
-                          Transform.translate(
-                            offset: Offset(_animation!.value.left, 0),
-                            child: widget.customAnimationOverlay ??
-                                Container(
-                                  height: widget.lineHeight,
-                                  width: _width / 3,
-                                  decoration: BoxDecoration(boxShadow: [
-                                    BoxShadow(
-                                        blurRadius: 18,
-                                        color: widget.animationOverlayColor ??
-                                            Color(0xFFFFFFFF),
-                                        offset: Offset(4, 3)),
-                                    BoxShadow(
-                                        blurRadius: 28,
-                                        color: widget.animationOverlayColor ??
-                                            Color(0xFFFFFFFF),
-                                        offset: Offset(1, 3)),
-                                  ]),
-                                ),
-                          )
-                        ],
-                      ),
-                    ),
-                  );
-                },)
-            : staticWidget,),
+          animation: _animation!,
+          builder: (context, child) {
+            return ClipRRect(
+              borderRadius: widget.borderRadius,
+              child: Stack(
+                clipBehavior: Clip.hardEdge,
+                children: <Widget>[
+                  child!,
+                  Transform.translate(
+                    offset: Offset(_animation!.value.left, 0),
+                    child: widget.customAnimationOverlay ??
+                        Container(
+                          height: widget.lineHeight,
+                          width: _width / 3,
+                          decoration: BoxDecoration(boxShadow: [
+                            BoxShadow(
+                                blurRadius: 18,
+                                color: widget.animationOverlayColor ??
+                                    const Color(0xFFFFFFFF),
+                                offset: const Offset(4, 3)),
+                            BoxShadow(
+                                blurRadius: 28,
+                                color: widget.animationOverlayColor ??
+                                    const Color(0xFFFFFFFF),
+                                offset: const Offset(1, 3)),
+                          ]),
+                        ),
+                  )
+                ],
+              ),
+            );
+          },
+          child: staticWidget,
+        )
+            : staticWidget,
       );
       if (i < widget.count - 1) {
         list.add(SizedBox(
-          height: widget.lineHeight,
+          height: widget.lineSpaceHeight,
         ));
       }
     }
@@ -246,17 +246,18 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   }
 
   double _getMaxConstrainedWidth(BoxConstraints constraints) {
-    double realMaxWidth = constraints.maxWidth;
+    var realMaxWidth = constraints.maxWidth;
     return realMaxWidth * widget.maxWidth;
   }
 
   double _getMinConstrainedWidth(BoxConstraints constraints) {
-    double realMaxWidth = constraints.maxWidth;
+    var realMaxWidth = constraints.maxWidth;
     return realMaxWidth * widget.minWidth;
   }
 
   @override
   void dispose() {
+    _disposed = true;
     _animationController.dispose();
     super.dispose();
   }
