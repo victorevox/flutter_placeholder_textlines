@@ -4,6 +4,8 @@ import 'package:flutter_placeholder_textlines/placeholder_lines.dart';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -19,7 +21,10 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+  const MyHomePage({
+    Key? key,
+    required this.title,
+  }) : super(key: key);
 
   final String title;
 
@@ -53,7 +58,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   _buildAnimated(),
                   _buildSubtitle("Card Example"),
                   _buildCardExample(),
-                  SizedBox(
+                  const SizedBox(
                     height: 20,
                   ),
                 ],
@@ -66,7 +71,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildCustomColorSizePlaceholder() {
-    return Container(
+    return const SizedBox(
       width: 200,
       child: PlaceholderLines(
         count: 4,
@@ -78,7 +83,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget _buildSimpleTextPlaceholder(TextAlign align) {
-    return Container(
+    return SizedBox(
       width: 300,
       child: PlaceholderLines(
         count: 3,
@@ -89,19 +94,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Widget _buildSubtitle(String title) {
     return Container(
-      padding: EdgeInsets.only(
+      padding: const EdgeInsets.only(
         top: 24,
         bottom: 16,
       ),
       child: Text(
         title,
-        style: TextStyle(fontSize: 20),
+        style: const TextStyle(fontSize: 20),
       ),
     );
   }
 
   _buildAnimated() {
-    return AnimatedWrapper();
+    return const AnimatedWrapper();
   }
 
   _buildCardExample() {
@@ -109,18 +114,18 @@ class _MyHomePageState extends State<MyHomePage> {
       borderRadius: BorderRadius.circular(10),
       elevation: 9,
       child: Container(
-        padding: EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
         width: 300,
         child: Row(
           children: <Widget>[
             Container(
-              margin: EdgeInsets.only(right: 16),
+              margin: const EdgeInsets.only(right: 16),
               width: 70,
               height: 70,
               decoration: BoxDecoration(
                 color: Colors.grey.withOpacity(.6),
               ),
-              child: Center(
+              child: const Center(
                 child: Icon(
                   Icons.photo_size_select_actual,
                   color: Colors.white,
@@ -128,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ),
-            Expanded(
+            const Expanded(
               child: PlaceholderLines(
                 count: 3,
               ),
@@ -142,7 +147,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
 class AnimatedWrapper extends StatefulWidget {
   const AnimatedWrapper({
-    Key key,
+    Key? key,
   }) : super(key: key);
 
   @override
@@ -161,12 +166,12 @@ class _AnimatedWrapperState extends State<AnimatedWrapper> {
     setState(() {
       _animated = !_animated;
     });
-    Future.delayed(Duration(seconds: 5)).then((_) => _changeState());
+    Future.delayed(const Duration(seconds: 5)).then((_) => _changeState());
   }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 300,
       child: PlaceholderLines(
         count: 3,

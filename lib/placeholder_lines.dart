@@ -36,7 +36,7 @@ class PlaceholderLines extends StatefulWidget {
   /// if [true], plays a nice animation of an overlay
   final bool animate;
 
-  /// Use a [customAnimationOverlay] to display instead of the difault one
+  /// Use a [customAnimationOverlay] to display instead of the default one
   final Widget? customAnimationOverlay;
 
   /// Set a custom [animationOverlayColor]
@@ -61,11 +61,8 @@ class PlaceholderLines extends StatefulWidget {
     this.customAnimationOverlay,
     this.animationOverlayColor,
     this.rebuildOnStateChange = false,
-  })  : assert(count is int),
-        assert(minOpacity <= 1 && maxOpacity <= 1),
+  })  : assert(minOpacity <= 1 && maxOpacity <= 1),
         assert(minWidth <= 1 && maxWidth <= 1),
-        assert(minOpacity is double),
-        assert(maxOpacity is double),
         assert(minOpacity <= maxOpacity),
         super(key: key);
 
@@ -73,8 +70,7 @@ class PlaceholderLines extends StatefulWidget {
   _PlaceholderLinesState createState() => _PlaceholderLinesState();
 }
 
-class _PlaceholderLinesState extends State<PlaceholderLines>
-    with SingleTickerProviderStateMixin {
+class _PlaceholderLinesState extends State<PlaceholderLines> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   Animation<RelativeRect>? _animation;
   late Map<int, double> _seeds;
@@ -117,13 +113,12 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
   }
 
   void _setupAnimation([Duration? _]) {
-    if(!mounted) return;
-    
+    if (!mounted) return;
+
     final RenderBox? renderO = context.findRenderObject() as RenderBox;
 
     if (renderO == null) {
-      throw Exception(
-          "RenderBox not found -- could not calculate BoxConstraints for "
+      throw Exception("RenderBox not found -- could not calculate BoxConstraints for "
           "placeholder_lines");
     }
 
@@ -180,15 +175,11 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
     List<Widget> list = [];
     for (var i = 0; i < widget.count; i++) {
       double _random = widget.rebuildOnStateChange ? _randomSeed : _seeds[i]!;
-      double _opacity = (widget.maxOpacity -
-              ((widget.maxOpacity - widget.minOpacity) * _random))
-          .abs();
+      double _opacity = (widget.maxOpacity - ((widget.maxOpacity - widget.minOpacity) * _random)).abs();
       // double realMaxWidth = constraints.maxWidth;
       double constrainedMaxWidth = _getMaxConstrainedWidth(constraints);
       double constrainedMinWidth = _getMinConstrainedWidth(constraints);
-      double _width = (constrainedMaxWidth -
-              ((constrainedMaxWidth - constrainedMinWidth) * _random))
-          .abs();
+      double _width = (constrainedMaxWidth - ((constrainedMaxWidth - constrainedMinWidth) * _random)).abs();
       final Widget staticWidget = Container(
         height: widget.lineHeight,
         width: _width,
@@ -197,44 +188,46 @@ class _PlaceholderLinesState extends State<PlaceholderLines>
         ),
       );
       list.add(
-        AnimatedSwitcher(duration: Duration(milliseconds: 400),child: _animation != null && widget.animate == true
-            ? AnimatedBuilder(
-                animation: _animation!,
-                child: staticWidget,
-                builder: (context, child) {
-                  return Container(
-                    // decoration: BoxDecoration(color: Colors.purple),
-                    child: ClipRect(
-                      child: Stack(
-                        clipBehavior: Clip.antiAlias,
-                        children: <Widget>[
-                          if (child != null) child,
-                          Transform.translate(
-                            offset: Offset(_animation!.value.left, 0),
-                            child: widget.customAnimationOverlay ??
-                                Container(
-                                  height: widget.lineHeight,
-                                  width: _width / 3,
-                                  decoration: BoxDecoration(boxShadow: [
-                                    BoxShadow(
-                                        blurRadius: 18,
-                                        color: widget.animationOverlayColor ??
-                                            Color(0xFFFFFFFF),
-                                        offset: Offset(4, 3)),
-                                    BoxShadow(
-                                        blurRadius: 28,
-                                        color: widget.animationOverlayColor ??
-                                            Color(0xFFFFFFFF),
-                                        offset: Offset(1, 3)),
-                                  ]),
-                                ),
-                          )
-                        ],
+        AnimatedSwitcher(
+          duration: Duration(milliseconds: 400),
+          child: _animation != null && widget.animate == true
+              ? AnimatedBuilder(
+                  animation: _animation!,
+                  child: staticWidget,
+                  builder: (context, child) {
+                    return Container(
+                      // decoration: BoxDecoration(color: Colors.purple),
+                      child: ClipRect(
+                        child: Stack(
+                          clipBehavior: Clip.antiAlias,
+                          children: <Widget>[
+                            if (child != null) child,
+                            Transform.translate(
+                              offset: Offset(_animation!.value.left, 0),
+                              child: widget.customAnimationOverlay ??
+                                  Container(
+                                    height: widget.lineHeight,
+                                    width: _width / 3,
+                                    decoration: BoxDecoration(boxShadow: [
+                                      BoxShadow(
+                                          blurRadius: 18,
+                                          color: widget.animationOverlayColor ?? Color(0xFFFFFFFF),
+                                          offset: Offset(4, 3)),
+                                      BoxShadow(
+                                          blurRadius: 28,
+                                          color: widget.animationOverlayColor ?? Color(0xFFFFFFFF),
+                                          offset: Offset(1, 3)),
+                                    ]),
+                                  ),
+                            )
+                          ],
+                        ),
                       ),
-                    ),
-                  );
-                },)
-            : staticWidget,),
+                    );
+                  },
+                )
+              : staticWidget,
+        ),
       );
       if (i < widget.count - 1) {
         list.add(SizedBox(
