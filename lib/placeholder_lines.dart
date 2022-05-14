@@ -106,7 +106,7 @@ class _PlaceholderLinesState extends State<PlaceholderLines> with SingleTickerPr
     );
 
     WidgetsFlutterBinding.ensureInitialized();
-    WidgetsBinding.instance!.addPostFrameCallback(_setupAnimation);
+    WidgetsBinding.instance.addPostFrameCallback(_setupAnimation);
     // if(widget.animate) {
     // }
     super.initState();
